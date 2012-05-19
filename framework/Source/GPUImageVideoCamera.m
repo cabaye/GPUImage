@@ -66,12 +66,21 @@
     
 	// Grab the back-facing or front-facing camera
     _inputCamera = nil;
+	NSError *error = nil;
 	NSArray *devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
 	for (AVCaptureDevice *device in devices) 
 	{
 		if ([device position] == cameraPosition)
 		{
 			_inputCamera = device;
+            
+            [device lockForConfiguration:&error];
+            if ([device isFocusModeSupported:AVCaptureFocusModeContinuousAutoFocus]) {
+                device.focusMode = AVCaptureFocusModeContinuousAutoFocus;
+                NSLog(@"Focus locked");
+            }
+            
+            [device unlockForConfiguration];
 		}
 	}
     
@@ -81,7 +90,6 @@
     [_captureSession beginConfiguration];
     
 	// Add the video input	
-	NSError *error = nil;
 	videoInput = [[AVCaptureDeviceInput alloc] initWithDevice:_inputCamera error:&error];
 	if ([_captureSession canAddInput:videoInput]) 
 	{

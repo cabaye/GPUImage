@@ -153,19 +153,20 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
     }
     
     // Set this to make sure that a functional movie is produced, even if the recording is cut off mid-stream. Only the last second should be lost in that case.
-    assetWriter.movieFragmentInterval = CMTimeMakeWithSeconds(1.0, 1000);
+    assetWriter.movieFragmentInterval = CMTimeMakeWithSeconds(1.0, 10);
+    assetWriter.shouldOptimizeForNetworkUse = YES;
     
     NSMutableDictionary * outputSettings = [[NSMutableDictionary alloc] init];
     [outputSettings setObject:AVVideoCodecH264 forKey:AVVideoCodecKey];
     [outputSettings setObject:[NSNumber numberWithInt:videoSize.width] forKey:AVVideoWidthKey];
     [outputSettings setObject:[NSNumber numberWithInt:videoSize.height] forKey:AVVideoHeightKey];
 
-    /*
+    
     NSDictionary *videoCleanApertureSettings = [NSDictionary dictionaryWithObjectsAndKeys:
                                                 [NSNumber numberWithInt:videoSize.width], AVVideoCleanApertureWidthKey,
                                                 [NSNumber numberWithInt:videoSize.height], AVVideoCleanApertureHeightKey,
-                                                [NSNumber numberWithInt:0], AVVideoCleanApertureHorizontalOffsetKey,
-                                                [NSNumber numberWithInt:0], AVVideoCleanApertureVerticalOffsetKey,
+                                                [NSNumber numberWithInt:2], AVVideoCleanApertureHorizontalOffsetKey,
+                                                [NSNumber numberWithInt:2], AVVideoCleanApertureVerticalOffsetKey,
                                                 nil];
 
     NSDictionary *videoAspectRatioSettings = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -176,12 +177,19 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
     NSMutableDictionary * compressionProperties = [[NSMutableDictionary alloc] init];
     [compressionProperties setObject:videoCleanApertureSettings forKey:AVVideoCleanApertureKey];
     [compressionProperties setObject:videoAspectRatioSettings forKey:AVVideoPixelAspectRatioKey];
-    [compressionProperties setObject:[NSNumber numberWithInt: 2000000] forKey:AVVideoAverageBitRateKey];
-    [compressionProperties setObject:[NSNumber numberWithInt: 16] forKey:AVVideoMaxKeyFrameIntervalKey];
+    [compressionProperties setObject:[NSNumber numberWithInt: 1.6*1024*1024] forKey:AVVideoAverageBitRateKey];
+    [compressionProperties setObject:[NSNumber numberWithInt: 24] forKey:AVVideoMaxKeyFrameIntervalKey];
     [compressionProperties setObject:AVVideoProfileLevelH264Main31 forKey:AVVideoProfileLevelKey];
     
+//    [compressionSettings setObject:AVVideoColorPrimaries_ITU_R_709_2
+//                            forKey:AVVideoColorPrimariesKey];
+//    [compressionSettings setObject:AVVideoTransferFunction_ITU_R_709_2
+//                            forKey:AVVideoTransferFunctionKey];
+//    [compressionSettings setObject:AVVideoYCbCrMatrix_ITU_R_709_2
+//                            forKey:AVVideoYCbCrMatrixKey];
+    
     [outputSettings setObject:compressionProperties forKey:AVVideoCompressionPropertiesKey];
-    */
+    
      
     assetWriterVideoInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeVideo outputSettings:outputSettings];
     assetWriterVideoInput.expectsMediaDataInRealTime = _encodingLiveVideo;
